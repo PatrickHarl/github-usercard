@@ -2,7 +2,9 @@
            (replacing the palceholder with your Github name):
            https://api.github.com/users/<your name>
 */
-axios.get('https://api.github.com/users/PatrickHarl')
+const followersArray = [];
+
+axios.get('https://api.github.com/users/PatrickHarl', {crossdomain: true})
       .then(response =>{
            
            let cardsContainer = document.querySelector('.cards')
@@ -10,9 +12,48 @@ axios.get('https://api.github.com/users/PatrickHarl')
            
            cardsContainer.appendChild(myCard)
 
+           axios.get('https://api.github.com/users/PatrickHarl/followers', {crossdomain: true})
+                .then(response => {
+
+              
+                  response.data.forEach(follower => {
+
+                    followersArray.push(follower.login)
+
+                  })
+                
+                  
+                  followersArray.forEach((followerName) => {
+
+                    axios.get(`https://api.github.com/users/${followerName}`, {crossdomain: true})
+                        .then((response) => {
+                  
+                          let cardsContainer = document.querySelector('.cards')
+                          let followerCard = createGitHubCard(response)
+                             
+                          cardsContainer.appendChild(followerCard)
+                  
+                        })
+                        .catch((err) => {
+                          //console.log("Failed creating follower card")
+                          console.log(err)
+                  
+                        })
+                  
+                  })
+
+                })
+                .catch(err => {
+                  //console.log("Failed creating follower array")
+                  console.log(err)
+
+                })
+
+          
+
       })
       .catch(err => {
-
+        //console.log("Failed creating my card")
             console.log(err)
 
       })
@@ -28,10 +69,6 @@ axios.get('https://api.github.com/users/PatrickHarl')
            create a new component and add it to the DOM as a child of .cards
 */
 
-
-
-
-
 /* Step 5: Now that you have your own card getting added to the DOM, either 
           follow this link in your browser https://api.github.com/users/<Your github name>/followers 
           , manually find some other users' github handles, or use the list found 
@@ -41,32 +78,8 @@ axios.get('https://api.github.com/users/PatrickHarl')
           Using that array, iterate over it, requesting data for each user, creating a new card for each
           user, and adding that card to the DOM.
 */
-const followersArray = ['nicholas-myers', 'corbinrobb', 'vailspencer', 'Kandelonius', 'avpimblesr'];
 
-
-
-followersArray.forEach((follower) => {
-
-  axios.get(`https://api.github.com/users/${follower}`)
-      .then((response) => {
-
-        let cardsContainer = document.querySelector('.cards')
-        let followerCard = createGitHubCard(response)
-           
-        cardsContainer.appendChild(followerCard)
-
-      })
-      .catch((err) => {
-
-        console.log(err)
-
-      })
-
-})
-
-
-
-
+//const followersArray = ['nicholas-myers', 'corbinrobb', 'vailspencer', 'Kandelonius', 'avpimblesr'];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
